@@ -2,3 +2,6 @@ data/
 .ipynb_checkpoints/
 tmp/
 auth
+scala/**/target/
+scala/**/.idea/
+scala/**/out/
