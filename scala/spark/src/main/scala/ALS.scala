@@ -32,7 +32,7 @@ object ALS {
 
     val als = new ALS()
       .setMaxIter(5)
-      .setRank(32)
+      .setRank(64)
       .setRegParam(0.01)
       .setUserCol("userId")
       .setItemCol("publicId")

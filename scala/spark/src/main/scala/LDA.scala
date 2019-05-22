@@ -40,7 +40,7 @@ object LDA {
       .zipWithIndex
       .map(parseFiltered)
 
-    val topics = 32
+    val topics = 64
 
     val lda = new LDA()
       .setK(topics)
