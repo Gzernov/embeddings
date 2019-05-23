@@ -1,6 +1,7 @@
 import java.io.File
 
 import org.apache.hadoop.fs.FileUtil
+import org.apache.spark.SparkContext
 import org.apache.spark.ml.recommendation.ALS
 import org.apache.spark.sql.SparkSession
 
@@ -30,10 +31,14 @@ object ALS {
       .map(parseFiltered)
       .toDF()
 
+    SparkContext.getOrCreate().setCheckpointDir("out/cdir")
+
     val als = new ALS()
-      .setMaxIter(5)
+      .setMaxIter(200)
       .setRank(64)
       .setRegParam(0.01)
+      .setSeed(1994790107)
+      .setCheckpointInterval(2)
       .setUserCol("userId")
       .setItemCol("publicId")
       .setRatingCol("eventType")
@@ -51,3 +56,4 @@ object ALS {
     spark.stop()
   }
 }
+//14:16:59

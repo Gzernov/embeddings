@@ -1,6 +1,7 @@
-import java.nio.charset.StandardCharsets
-import java.nio.file.{Files, Paths}
+import java.io.File
 
+import org.apache.hadoop.fs.FileUtil
+import org.apache.spark.SparkContext
 import org.apache.spark.mllib.clustering.LDA
 import org.apache.spark.mllib.linalg
 import org.apache.spark.mllib.linalg.Vectors
@@ -40,21 +41,31 @@ object LDA {
       .zipWithIndex
       .map(parseFiltered)
 
+    SparkContext.getOrCreate().setCheckpointDir("out/cdir")
+
     val topics = 64
 
     val lda = new LDA()
       .setK(topics)
-      .setMaxIterations(5)
+      .setSeed(1994790107)
+      .setCheckpointInterval(2)
+      .setMaxIterations(50)
 
     val ldaTrained = lda.run(filtered)
 
-    Files.write(
-      Paths.get("out/lda_embeddings"),
-      ldaTrained
-        .topicsMatrix
-        .toString(vocab_size, vocab_size)
-        .getBytes(StandardCharsets.UTF_8)
-    )
+    FileUtil.fullyDelete(new File("out/lda_embeddings"))
+
+    val out = ldaTrained
+      .topicsMatrix
+      .transpose
+      .toArray
+      .grouped(ldaTrained.topicsMatrix.numCols)
+      .toList
+      .map(line => line.mkString(" "))
+
+    SparkContext.getOrCreate().parallelize(out)
+      .repartition(1)
+      .saveAsTextFile("out/lda_embeddings")
 
     spark.stop()
   }
