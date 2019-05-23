@@ -6,14 +6,28 @@ import org.apache.spark.ml.recommendation.ALS
 import org.apache.spark.sql.SparkSession
 
 object ALS {
+  var MODE = 10
+
   case class Event(userId: Int, publicId: Int, eventType: Int)
 
   def parseFiltered(str: String): Event = {
     val fields = str.split(" ")
 
-    assert(fields.size == 2)
+    var rating = 0
 
-    Event(fields(0).toInt, fields(1).toInt.abs, if (fields(1).toInt < 0) -1 else 1)
+    if (MODE == 9){
+      assert(fields.size == 2)
+
+      rating = if (fields(1).toInt < 0) -1 else 1
+    } else {
+      assert(fields.size == 3)
+
+      rating = fields(2).toInt
+    }
+
+    assert(rating != 0)
+
+    Event(fields(0).toInt, fields(1).toInt.abs, rating)
   }
 
   def main(args: Array[String]) {
@@ -27,7 +41,7 @@ object ALS {
 
     val filtered = spark
       .read
-      .textFile("../../data/als_filtered")
+      .textFile("../../data/als_filtered" + MODE)
       .map(parseFiltered)
       .toDF()
 
@@ -56,4 +70,3 @@ object ALS {
     spark.stop()
   }
 }
-//14:16:59

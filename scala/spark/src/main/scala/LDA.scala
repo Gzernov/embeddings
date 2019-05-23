@@ -8,6 +8,8 @@ import org.apache.spark.mllib.linalg.Vectors
 import org.apache.spark.sql.SparkSession
 
 object LDA {
+  var MODE = 10
+
   var vocab_size: Int = -1
 
   def parseFiltered(x: (String, Long)): (Long, linalg.Vector) = {
@@ -15,7 +17,11 @@ object LDA {
 
     val int_arr = arr.map(s => s.toInt)
 
-    (x._2, Vectors.sparse(vocab_size, int_arr, arr.map(_ => 1.0)))
+    val unique = int_arr.toSet.toArray
+
+    val counts:Array[Double] = unique.map(x => int_arr.count(y => y == x)).map(x => x.toDouble)
+
+    (x._2, Vectors.sparse(vocab_size, unique, counts))
   }
 
   def main(args: Array[String]) {
@@ -27,7 +33,7 @@ object LDA {
 
     val raw = spark
       .read
-      .textFile("../../data/lda_filtered")
+      .textFile("../../data/lda_filtered" + MODE)
       .rdd
 
     vocab_size = raw
