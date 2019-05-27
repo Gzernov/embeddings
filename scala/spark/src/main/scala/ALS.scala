@@ -6,7 +6,9 @@ import org.apache.spark.ml.recommendation.ALS
 import org.apache.spark.sql.SparkSession
 
 object ALS {
-  var MODE = 10
+  var MODE = 11
+
+  var C = 3
 
   case class Event(userId: Int, publicId: Int, eventType: Int)
 
@@ -15,10 +17,11 @@ object ALS {
 
     var rating = 0
 
-    if (MODE == 9){
-      assert(fields.size == 2)
-
+    if (fields.size == 2) {
       rating = if (fields(1).toInt < 0) -1 else 1
+      if (MODE == 11) {
+        rating = rating.*(C)
+      }
     } else {
       assert(fields.size == 3)
 

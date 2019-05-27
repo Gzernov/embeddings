@@ -8,18 +8,26 @@ import org.apache.spark.mllib.linalg.Vectors
 import org.apache.spark.sql.SparkSession
 
 object LDA {
-  var MODE = 10
+  var MODE = 11
 
   var vocab_size: Int = -1
 
   def parseFiltered(x: (String, Long)): (Long, linalg.Vector) = {
-    val arr = x._1.split(" ")
+    var arr = x._1.split(" ")
+
+    var c = 1
+
+    if (arr.nonEmpty && arr(arr.length -1).charAt(0) == '*') {
+      arr = arr.slice(0, arr.length - 1)
+
+      c = 3
+    }
 
     val int_arr = arr.map(s => s.toInt)
 
     val unique = int_arr.toSet.toArray
 
-    val counts:Array[Double] = unique.map(x => int_arr.count(y => y == x)).map(x => x.toDouble)
+    val counts:Array[Double] = unique.map(x => int_arr.count(y => y == x) * c).map(x => x.toDouble)
 
     (x._2, Vectors.sparse(vocab_size, unique, counts))
   }
