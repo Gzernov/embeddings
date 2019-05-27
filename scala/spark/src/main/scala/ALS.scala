@@ -51,7 +51,7 @@ object ALS {
     SparkContext.getOrCreate().setCheckpointDir("out/cdir")
 
     val als = new ALS()
-      .setMaxIter(200)
+      .setMaxIter(50)
       .setRank(64)
       .setRegParam(0.01)
       .setSeed(1994790107)
