@@ -8,7 +8,7 @@ import org.apache.spark.mllib.linalg.Vectors
 import org.apache.spark.sql.SparkSession
 
 object LDA {
-  var MODE = 11
+  var MODE = 3
 
   var vocab_size: Int = -1
 
@@ -20,7 +20,7 @@ object LDA {
     if (arr.nonEmpty && arr(arr.length -1).charAt(0) == '*') {
       arr = arr.slice(0, arr.length - 1)
 
-      c = 3
+      c = 2
     }
 
     val int_arr = arr.map(s => s.toInt)
